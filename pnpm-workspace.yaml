@@ -55,6 +55,7 @@ overrides:
 # Explicitly allow build scripts for packages that require them
 # (replaces onlyBuiltDependencies)
 allowBuilds:
+  duckdb: true
   esbuild: true
   sharp: true
   sqlite3: true
