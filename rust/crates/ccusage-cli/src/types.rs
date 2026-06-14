@@ -30,6 +30,21 @@ pub enum Command {
     Kimi(AgentCommandArgs),
     Qwen(AgentCommandArgs),
     OpenClaw(AgentCommandArgs),
+    Export(ExportArgs),
+}
+
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
+pub enum ExportFormat {
+    #[default]
+    Csv,
+    JsonLines,
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct ExportArgs {
+    pub shared: SharedArgs,
+    pub format: ExportFormat,
+    pub output: Option<String>,
 }
 
 #[derive(Clone, Debug, Default)]

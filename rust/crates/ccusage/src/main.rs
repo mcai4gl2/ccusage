@@ -145,6 +145,7 @@ fn main() -> Result<()> {
         Some(Command::Gemini(args)) => adapter::gemini::run(args),
         Some(Command::Kimi(args)) => adapter::kimi::run(args),
         Some(Command::OpenClaw(args)) => adapter::openclaw::run(args),
+        Some(Command::Export(args)) => commands::export::run_export(args),
         None => {
             let args = AgentCommandArgs {
                 shared: cli.shared,

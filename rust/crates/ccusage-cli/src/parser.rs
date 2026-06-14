@@ -5,8 +5,8 @@ use crate::help::{print_help_and_exit, print_version_and_exit};
 use crate::types::{OPENCODE_AGENT_REPORTS, STANDARD_AGENT_REPORTS};
 use crate::{
     AgentCommandArgs, AgentReportKind, BlocksArgs, Cli, CliConfig, CodexSpeed, Command, CostMode,
-    CostSource, DailyArgs, NoConfig, SessionArgs, SharedArgs, SortOrder, StatuslineArgs,
-    VisualBurnRate, WeekDay, WeeklyArgs, normalize_date_bound,
+    CostSource, DailyArgs, ExportArgs, ExportFormat, NoConfig, SessionArgs, SharedArgs, SortOrder,
+    StatuslineArgs, VisualBurnRate, WeekDay, WeeklyArgs, normalize_date_bound,
 };
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -264,6 +264,34 @@ fn parse_command(
             Command::Qwen,
         ),
         "openclaw" => parse_openclaw_command(parser, shared, config),
+        "export" => {
+            let format = match parser.peek() {
+                Some("jsonl") => {
+                    parser.next();
+                    ExportFormat::JsonLines
+                }
+                Some("csv") => {
+                    parser.next();
+                    ExportFormat::Csv
+                }
+                Some(other) if !other.starts_with('-') => {
+                    let other = other.to_string();
+                    return Err(format!("Unknown export format '{other}'"));
+                }
+                _ => ExportFormat::Csv,
+            };
+            let mut output = None;
+            while parser.peek().is_some() {
+                if parse_shared_arg_for_command(parser, &mut shared)? {
+                    continue;
+                }
+                match parser.next_flag()?.as_str() {
+                    "--output" | "-o" => output = Some(parser.value_for("--output")?),
+                    flag => return Err(format!("Unknown export option '{flag}'")),
+                }
+            }
+            Ok(Command::Export(ExportArgs { shared, format, output }))
+        }
         _ => Err(format!("Unknown command '{command}'")),
     }
 }
@@ -631,6 +659,7 @@ fn is_command(arg: &str) -> bool {
             | "gemini"
             | "kimi"
             | "qwen"
+            | "export"
     )
 }
 
@@ -767,6 +796,7 @@ fn option_takes_value(arg: &str) -> bool {
             | "--speed"
             | "--pi-path"
             | "--open-claw-path"
+            | "--output"
     )
 }
 
