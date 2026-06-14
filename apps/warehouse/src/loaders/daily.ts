@@ -9,7 +9,7 @@ export interface DailyLoaderOptions {
 
 export function loadDaily(opts: DailyLoaderOptions = {}): AllDailyRow[] {
   const bin = opts.ccusageBin ?? 'ccusage';
-  const args = ['all', '--json'];
+  const args = ['claude', 'daily', '--json'];
   if (opts.since) args.push('--since', opts.since);
 
   const result = spawnSync(bin, args, {

@@ -1,6 +1,6 @@
 // apps/warehouse/src/types.ts
 
-/** One session from `ccusage session --json` (Claude Code adapter). */
+/** One session from `ccusage claude session --json`. */
 export interface CcusageSession {
   sessionId: string;
   projectPath: string;
@@ -25,10 +25,9 @@ export interface CcusageSessionResponse {
   };
 }
 
-/** One row from the `daily` array in `ccusage all --json`. */
+/** One row from the `daily` array in `ccusage claude daily --json`. */
 export interface AllDailyRow {
-  period: string;            // "YYYY-MM-DD"
-  agent: string;             // "all" | "claude" | "codex" | "amp" | ...
+  date: string;              // "YYYY-MM-DD"
   modelsUsed: string[];
   inputTokens: number;
   outputTokens: number;
@@ -36,7 +35,6 @@ export interface AllDailyRow {
   cacheReadTokens: number;
   totalTokens: number;
   totalCost: number;
-  agentBreakdowns?: AllDailyRow[];
 }
 
 export interface AllDailyResponse {
@@ -45,4 +43,71 @@ export interface AllDailyResponse {
     totalCost: number;
     totalTokens: number;
   };
+}
+
+/** One session from `ccusage codex session --json`. */
+export interface CodexSession {
+  sessionId: string;
+  directory: string;
+  lastActivity: string;
+  inputTokens: number;
+  outputTokens: number;
+  cacheCreationTokens: number;
+  cacheReadTokens: number;
+  reasoningOutputTokens: number;
+  totalTokens: number;
+  costUSD: number;
+  models: Record<string, unknown>;
+  sessionFile: string;
+}
+
+export interface CodexSessionResponse {
+  sessions: CodexSession[];
+}
+
+export interface CodexDailyRow {
+  date: string;
+  inputTokens: number;
+  outputTokens: number;
+  cacheCreationTokens: number;
+  cacheReadTokens: number;
+  reasoningOutputTokens: number;
+  totalTokens: number;
+  costUSD: number;
+  models: Record<string, unknown>;
+}
+
+export interface CodexDailyResponse {
+  daily: CodexDailyRow[];
+}
+
+/** Session shape shared by opencode, gemini, and similar agents. */
+export interface GenericAgentSession {
+  sessionId: string;
+  modelsUsed: string[];
+  inputTokens: number;
+  outputTokens: number;
+  cacheCreationTokens: number;
+  cacheReadTokens: number;
+  totalTokens: number;
+  totalCost: number;
+}
+
+export interface GenericAgentSessionResponse {
+  sessions: GenericAgentSession[];
+}
+
+export interface GenericAgentDailyRow {
+  date: string;
+  modelsUsed: string[];
+  inputTokens: number;
+  outputTokens: number;
+  cacheCreationTokens: number;
+  cacheReadTokens: number;
+  totalTokens: number;
+  totalCost: number;
+}
+
+export interface GenericAgentDailyResponse {
+  daily: GenericAgentDailyRow[];
 }

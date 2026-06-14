@@ -19,13 +19,16 @@ const VIEWS: Record<string, string> = {
   v_cost_by_model: `
     CREATE OR REPLACE VIEW v_cost_by_model AS
     SELECT
-      unnest(string_split(model_set, ',')) AS model,
-      count(*)                             AS session_count,
-      sum(estimated_cost_usd)              AS total_cost_usd,
-      sum(total_tokens)                    AS total_tokens
-    FROM sessions
-    WHERE model_set IS NOT NULL
-    GROUP BY 1
+      model,
+      count(*)                AS session_count,
+      sum(estimated_cost_usd) AS total_cost_usd,
+      sum(total_tokens)       AS total_tokens
+    FROM (
+      SELECT unnest(string_split(model_set, ',')) AS model,
+             estimated_cost_usd, total_tokens
+      FROM sessions WHERE model_set IS NOT NULL
+    )
+    GROUP BY model
     ORDER BY total_cost_usd DESC`,
 
   v_cost_by_agent: `
@@ -67,15 +70,18 @@ const VIEWS: Record<string, string> = {
   v_model_roi: `
     CREATE OR REPLACE VIEW v_model_roi AS
     SELECT
-      unnest(string_split(model_set, ','))   AS model,
+      model,
       count(*)                               AS session_count,
       sum(total_tokens)                      AS total_tokens,
       sum(estimated_cost_usd)                AS total_cost_usd,
       round(sum(estimated_cost_usd) / nullif(sum(total_tokens), 0) * 1e6, 4)
                                              AS cost_per_million_tokens
-    FROM sessions
-    WHERE model_set IS NOT NULL
-    GROUP BY 1
+    FROM (
+      SELECT unnest(string_split(model_set, ',')) AS model,
+             total_tokens, estimated_cost_usd
+      FROM sessions WHERE model_set IS NOT NULL
+    )
+    GROUP BY model
     ORDER BY total_cost_usd DESC`,
 };
 

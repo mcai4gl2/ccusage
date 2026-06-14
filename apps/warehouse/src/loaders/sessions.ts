@@ -9,7 +9,7 @@ export interface SessionLoaderOptions {
 
 export function loadSessions(opts: SessionLoaderOptions = {}): CcusageSession[] {
   const bin = opts.ccusageBin ?? 'ccusage';
-  const args = ['session', '--json'];
+  const args = ['claude', 'session', '--json'];
   if (opts.since) args.push('--since', opts.since);
 
   const result = spawnSync(bin, args, {

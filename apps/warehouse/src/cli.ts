@@ -52,16 +52,20 @@ async function main(): Promise<void> {
     }
 
     case 'query': {
-      const sql = rest.find(a => !a.startsWith('--'));
+      const dbPath = flagValue('--db') ?? defaultWarehousePath();
+      // Skip flag names and their values; the SQL is the remaining positional arg
+      const flagValues = new Set(
+        ['--db'].flatMap(f => { const v = flagValue(f); return v ? [f, v] : [f]; })
+      );
+      const sql = rest.find(a => !a.startsWith('--') && !flagValues.has(a));
       if (!sql) {
         console.error('Usage: ccusage-warehouse query [--db <path>] "<sql>"');
         process.exit(1);
       }
-      const dbPath = flagValue('--db') ?? defaultWarehousePath();
       const db = await openWarehouse(dbPath);
       try {
         const rows = await db.query(sql);
-        console.log(JSON.stringify(rows, null, 2));
+        console.log(JSON.stringify(rows, (_k, v) => typeof v === 'bigint' ? Number(v) : v, 2));
       } finally {
         await db.close();
       }
@@ -77,7 +81,7 @@ async function main(): Promise<void> {
         if (format === 'json') {
           const rows = await db.query('SELECT * FROM sessions ORDER BY started_at');
           const fs = await import('node:fs');
-          fs.writeFileSync(out, JSON.stringify(rows, null, 2));
+          fs.writeFileSync(out, JSON.stringify(rows, (_k, v) => typeof v === 'bigint' ? Number(v) : v, 2));
         } else {
           await db.run(`COPY sessions TO '${out}' (FORMAT ${format.toUpperCase()})`);
         }
