@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "duckdb-async": "^1.4.2"
+    "duckdb-async": "^1.4.2",
+    "tsx": "^4.22.4"
   },
   "devDependencies": {
     "typescript": "^5.8.0"

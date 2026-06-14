@@ -1,4 +1,4 @@
-#!/usr/bin/env -S node --experimental-strip-types
+#!/usr/bin/env tsx
 // apps/warehouse/src/cli.ts
 import { sync } from './sync.js';
 import { openWarehouse, defaultWarehousePath } from './db.js';

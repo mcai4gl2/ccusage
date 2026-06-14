@@ -6,7 +6,7 @@ PKG="$DIR/apps/warehouse"
 
 if [[ ! -d "$PKG/node_modules/duckdb-async" ]]; then
   echo "Installing warehouse dependencies..." >&2
-  (cd "$PKG" && npm install --no-save 2>/dev/null || npm install)
+  (cd "$PKG" && npm install --no-workspaces)
 fi
 
-exec node --experimental-strip-types "$PKG/src/cli.ts" "$@"
+exec "$PKG/node_modules/.bin/tsx" "$PKG/src/cli.ts" "$@"
